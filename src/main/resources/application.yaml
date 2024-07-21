@@ -23,6 +23,9 @@ spring:
     throw-exception-if-no-handler-found: true
     async:
       request-timeout: 3600000
+    hiddenmethod:
+      filter:
+        enabled: true
 server:
   port: 8080
   error:

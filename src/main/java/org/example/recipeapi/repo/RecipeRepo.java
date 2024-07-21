@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface RecipeRepo extends JpaRepository<Recipe, String> {
     Optional<Recipe> findById(String id);
+    void deleteById(String id);
 }

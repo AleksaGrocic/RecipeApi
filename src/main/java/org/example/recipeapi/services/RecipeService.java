@@ -42,8 +42,8 @@ public class RecipeService {
         return recipeRepo.save(recipe);
     }
 
-    public void deleteRecipe(Recipe recipe) {
-        recipeRepo.delete(recipe);
+    public void deleteRecipe(String id) {
+        recipeRepo.deleteById(id);
     }
 
     public String uploadImage(String id, MultipartFile file) {

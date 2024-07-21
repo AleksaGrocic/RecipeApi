@@ -47,4 +47,9 @@ public class RecipeController {
     public byte[] getImage(@PathVariable("filename") String filename) throws IOException {
         return Files.readAllBytes(Paths.get(IMAGE_DIRECTORY + filename));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteRecipe(@PathVariable(value = "id") String id) {
+        recipeService.deleteRecipe(id);
+    }
 }
