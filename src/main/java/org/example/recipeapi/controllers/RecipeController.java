@@ -29,12 +29,12 @@ public class RecipeController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Recipe>> getRecipes(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<Page<Recipe>> getAllRecipes(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
         return ResponseEntity.ok().body(recipeService.getAllRecipes(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getContact(@PathVariable(value = "id") String id) {
+    public ResponseEntity<Recipe> getRecipe(@PathVariable(value = "id") String id) {
         return ResponseEntity.ok().body(recipeService.getRecipe(id));
     }
 
