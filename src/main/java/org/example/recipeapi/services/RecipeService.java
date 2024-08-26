@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,8 +44,11 @@ public class RecipeService {
     }
 
     public void deleteRecipe(String id) {
+        Recipe recipe = getRecipe(id);
         recipeRepo.deleteById(id);
+        deleteImage(recipe.getImageUrl());
     }
+
 
     public String uploadImage(String id, MultipartFile file) {
         log.info("Saving image for recipe ID: {}", id);
@@ -54,6 +58,18 @@ public class RecipeService {
         recipeRepo.save(recipe);
 
         return imageUrl;
+    }
+
+    private void deleteImage(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            try {
+                Path imagePath = Paths.get(IMAGE_DIRECTORY, imageUrl.substring(imageUrl.lastIndexOf('/') + 1));
+                Files.deleteIfExists(imagePath);
+                log.info("Deleted image: {}", imagePath);
+            } catch (IOException e) {
+                log.error("Failed to delete image file: {}", e.getMessage());
+            }
+        }
     }
 
     private final Function<String, String> fileExtension = filename -> Optional.of(filename).filter(name -> name.contains(".")).map(name -> "." + name.substring(filename.lastIndexOf(".") + 1)).orElse(".png");

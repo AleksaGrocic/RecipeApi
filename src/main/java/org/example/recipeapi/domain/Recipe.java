@@ -27,6 +27,7 @@ public class Recipe {
     private String id;
     private String name;
     private String category;
+    @Column(name = "recipe", columnDefinition = "text")
     private String recipe;
     private String imageUrl;
 }
