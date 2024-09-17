@@ -4,9 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.recipeapi.domain.Recipe;
-import org.example.recipeapi.repo.RecipeRepo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.example.recipeapi.repo.RecipeRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -28,48 +27,39 @@ import static org.example.recipeapi.constants.Constant.IMAGE_DIRECTORY;
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 public class RecipeService {
-    private final RecipeRepo recipeRepo;
+    private final RecipeRepository recipeRepository;
 
-    public Page<Recipe> getAllRecipes(int page, int size) {
-        return recipeRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
-
+    public List<Recipe> getAllRecipes() {
+        return recipeRepository.findAll(Sort.by("name"));
     }
 
     public Recipe getRecipe(String id) {
-        return recipeRepo.findById(id).orElseThrow(() -> new RuntimeException("Recipe not found."));
+        return recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found."));
     }
 
     public Recipe createRecipe(Recipe recipe) {
-        return recipeRepo.save(recipe);
-    }
-
-    public void deleteRecipe(String id) {
-        Recipe recipe = getRecipe(id);
-        recipeRepo.deleteById(id);
-        deleteImage(recipe.getImageUrl());
-    }
-
-
-    public String uploadImage(String id, MultipartFile file) {
-        log.info("Saving image for recipe ID: {}", id);
-        Recipe recipe = getRecipe(id);
-        String imageUrl = imageFunction.apply(id, file);
-        recipe.setImageUrl(imageUrl);
-        recipeRepo.save(recipe);
-
-        return imageUrl;
+        return recipeRepository.save(recipe);
     }
 
     private void deleteImage(String imageUrl) {
         if (imageUrl != null && !imageUrl.isEmpty()) {
             try {
-                Path imagePath = Paths.get(IMAGE_DIRECTORY, imageUrl.substring(imageUrl.lastIndexOf('/') + 1));
+                Path imagePath = Paths.get(
+                        IMAGE_DIRECTORY, imageUrl.substring(
+                                imageUrl.lastIndexOf('/') + 1
+                        ));
                 Files.deleteIfExists(imagePath);
-                log.info("Deleted image: {}", imagePath);
             } catch (IOException e) {
                 log.error("Failed to delete image file: {}", e.getMessage());
             }
         }
+    }
+
+    public void deleteRecipe(String id) {
+        Recipe recipe = getRecipe(id);
+        recipeRepository.deleteById(id);
+        deleteImage(recipe.getImageUrl());
     }
 
     private final Function<String, String> fileExtension = filename -> Optional.of(filename).filter(name -> name.contains(".")).map(name -> "." + name.substring(filename.lastIndexOf(".") + 1)).orElse(".png");
@@ -87,4 +77,13 @@ public class RecipeService {
             throw new RuntimeException("Unable to save image.");
         }
     };
+
+    public String uploadImage(String id, MultipartFile file) {
+        Recipe recipe = getRecipe(id);
+        String imageUrl = imageFunction.apply(id, file);
+        recipe.setImageUrl(imageUrl);
+        recipeRepository.save(recipe);
+        return imageUrl;
+    }
 }
+

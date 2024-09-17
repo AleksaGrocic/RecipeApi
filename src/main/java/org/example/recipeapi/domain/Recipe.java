@@ -1,6 +1,5 @@
 package org.example.recipeapi.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,14 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@JsonInclude(NON_DEFAULT)
 @Table(name = "recipes")
 public class Recipe {
     @Id
@@ -31,3 +28,4 @@ public class Recipe {
     private String recipe;
     private String imageUrl;
 }
+
